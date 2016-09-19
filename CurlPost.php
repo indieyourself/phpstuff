@@ -25,7 +25,7 @@ function post( $url, $data) {
 	return $response;
 }
 
-$url = "";
+$url = "http://192.168.10.92:8083/bc/log?_t=123456&_v=1.0&_os=1&channel=99999";
 $data = array(
 		
 );
