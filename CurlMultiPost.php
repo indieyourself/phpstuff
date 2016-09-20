@@ -6,37 +6,36 @@
 function multipost( $url, $data, $num) {
 	$mch = curl_multi_init();
 	
-	$ch = array();
+	$chs = array();
 	
 	for( $i=0; $i < $num; ++$i) {
-		$ch[$i] = curl_init($url);
-		curl_setopt($ch[$i], CURLOPT_POST, true);
-		curl_setopt($ch[$i], CURLOPT_SSL_VERIFYHOST, 2);
-		curl_setopt($ch[$i], CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch[$i], CURLOPT_POSTFIELDS, $data);
-		curl_setopt($ch[$i], CURLOPT_TIMEOUT, 300);
-		curl_setopt($ch[$i], CURLOPT_CONNECTTIMEOUT, 300);
-		curl_setopt($ch[$i], CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch[$i], CURLOPT_FOLLOWLOCATION, true);
+		$chs[$i] = curl_init($url);
+		curl_setopt($chs[$i], CURLOPT_POST, true);
+		curl_setopt($chs[$i], CURLOPT_SSL_VERIFYHOST, 2);
+		curl_setopt($chs[$i], CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($chs[$i], CURLOPT_POSTFIELDS, $data);
+		curl_setopt($chs[$i], CURLOPT_TIMEOUT, 300);
+		curl_setopt($chs[$i], CURLOPT_CONNECTTIMEOUT, 300);
+		curl_setopt($chs[$i], CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($chs[$i], CURLOPT_FOLLOWLOCATION, true);
 		
-		curl_multi_add_handle($mch, $ch[$i]);
+		curl_multi_add_handle($mch, $chs[$i]);
 	}
 	
-	$still_running = null;
+	$active = null;
 	do {
-		$mrc = curl_multi_exec($mch, $still_running);
-	} while($still_running );
+		$mrc = curl_multi_exec($mch, $active);
+		curl_multi_select($mch);
+	} while($active > 0 );
 	
-	foreach ( $ch as $i => $h ) {
-		$response = curl_multi_getcontent($h);
-		$errno    = curl_errno($h);
+	foreach ( $chs as$ch ) {
+		$response = curl_multi_getcontent($ch);
+		$errno    = curl_errno($ch);
 		if ($errno != 0) {
 			echo( "post errno=$errno response=$response");
 		}
-	}
-	
-	foreach ( $ch as $h ) {
-		curl_multi_remove_handle($ch, $h);
+		
+		curl_multi_remove_handle($chs, $ch);
 	}
 	
 	curl_multi_close($mch);
