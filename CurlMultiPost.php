@@ -19,7 +19,7 @@ function multipost( $url, $data, $num) {
 		curl_setopt($ch[$i], CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch[$i], CURLOPT_FOLLOWLOCATION, true);
 		
-		curl_multi_add_handle($mh, $ch[$i]);
+		curl_multi_add_handle($mch, $ch[$i]);
 	}
 	
 	$still_running = null;
