@@ -27,16 +27,16 @@ function multipost( $url, $data, $num) {
 		$mrc = curl_multi_exec($mch, $still_running);
 	} while($still_running );
 	
-	foreach ( $mch as $i => $ch ) {
-		$response = curl_multi_getcontent($ch);
-		$errno    = curl_errno($ch);
+	foreach ( $ch as $i => $h ) {
+		$response = curl_multi_getcontent($h);
+		$errno    = curl_errno($h);
 		if ($errno != 0) {
 			echo( "post errno=$errno response=$response");
 		}
 	}
 	
-	foreach ( $mch as $ch ) {
-		curl_multi_remove_handle($mch, $ch);
+	foreach ( $ch as $h ) {
+		curl_multi_remove_handle($ch, $h);
 	}
 	
 	curl_multi_close($mch);
